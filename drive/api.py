@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 
-from googlelibraries.credencial_manager import CredentialsManager
+from googlelibraries.credentials_manager import CredentialsManager
 
 if TYPE_CHECKING:
     from collections.abc import Generator

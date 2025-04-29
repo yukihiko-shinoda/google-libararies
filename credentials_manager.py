@@ -1,4 +1,4 @@
-"""Credential manager.
+"""Credentials manager.
 
 see: https://developers.google.com/calendar/api/quickstart/python
 """
@@ -13,7 +13,7 @@ from googlelibraries.token_manager import TokenManager
 
 
 class CredentialsManager:
-    """Credential manager."""
+    """Credentials manager."""
 
     PATH_TO_CREDENTIALS = DIRECTORY_GCP_SECRET / "credentials.json"
 
