@@ -53,7 +53,7 @@ class EventManager:
         # Reason: Meta programming is used. pylint: disable-next=no-member
         self.service.events().insert(calendarId=self.calendar_id, body=event.convert_to_body()).execute()
 
-    def iterate_future_event(self) -> Generator[Event]:
+    def iterate_future_event(self, now: datetime.datetime) -> Generator[Event]:
         """Iterates the events."""
         # Reason: Meta programming is used. pylint: disable-next=no-member
         events_resource = self.service.events()
@@ -61,7 +61,7 @@ class EventManager:
         while True:
             events_result = events_resource.list(
                 calendarId=self.calendar_id,
-                timeMin=self.create_now_string(),
+                timeMin=now.replace(microsecond=0).isoformat(),
                 singleEvents=True,
                 orderBy="startTime",
                 # Reason: Official documentation's instruction:
