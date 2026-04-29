@@ -55,9 +55,17 @@ class File:
 
 
 class FileFactory:
-    def __init__(self, directory_cache: Path) -> None:
+    def __init__(
+        self,
+        directory_cache: Path,
+        path_to_credentials: Path | None = None,
+        path_to_token: Path | None = None,
+    ) -> None:
         self.directory_cache = directory_cache
-        self.drive = GoogleDrive()
+        self.drive = GoogleDrive(
+            path_to_credentials=path_to_credentials,
+            path_to_token=path_to_token,
+        )
 
     def create(self, folder_name: str, file_name_contains: str) -> File:
         return File(self.drive, self.directory_cache, folder_name, file_name_contains)

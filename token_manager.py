@@ -35,9 +35,8 @@ class TokenManager:
 
     def refresh(self, credentials: Credentials) -> Credentials | None:
         """Refreshes the credentials."""
-        # Reason: The google-auth-oauthlib's issue.
         try:
-            credentials.refresh(Request())  # type: ignore[no-untyped-call]
+            credentials.refresh(Request())
         except RefreshError as error:
             message = "('invalid_grant: Bad Request', {'error': 'invalid_grant', 'error_description': 'Bad Request'})"
             if str(error) == message:

@@ -3,7 +3,8 @@
 import io
 from logging import getLogger
 from pathlib import Path
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import ClassVar
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -27,9 +28,18 @@ class GoogleDrive:
         "https://www.googleapis.com/auth/drive.readonly",
     ]
 
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        path_to_credentials: Path | None = None,
+        path_to_token: Path | None = None,
+    ) -> None:
         self.logger = getLogger(__name__)
-        credentials = CredentialsManager(self.SCOPES, is_inside_of_container=True).create()
+        credentials = CredentialsManager(
+            self.SCOPES,
+            is_inside_of_container=True,
+            path_to_credentials=path_to_credentials,
+            path_to_token=path_to_token,
+        ).create()
         service: DriveResource = build("drive", "v3", credentials=credentials)
         # Reason: pylint: disable-next=no-member
         self.resource = service.files()
