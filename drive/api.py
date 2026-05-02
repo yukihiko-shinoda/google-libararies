@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import ClassVar
 
+import google.auth
+from google.auth.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
@@ -15,18 +17,36 @@ from googlelibraries.credentials_manager import CredentialsManager
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from google.auth.exceptions import DefaultCredentialsError
     from googleapiclient._apis.drive.v3.resources import DriveResource
     from googleapiclient._apis.drive.v3.schemas import File
 
 
-class GoogleDrive:
-    """The Google Drive API."""
-
+class CredentialsFactory:
     # If modifying these scopes, delete the file token.json.
     SCOPES: ClassVar = [
         "https://www.googleapis.com/auth/drive.metadata.readonly",
         "https://www.googleapis.com/auth/drive.readonly",
     ]
+
+    @classmethod
+    def create(cls, path_to_credentials: Path | None = None, path_to_token: Path | None = None) -> Credentials:
+        try:
+            return google.auth.default()[0]
+        except DefaultCredentialsError:
+            if not path_to_credentials or not path_to_token:
+                raise
+        # For backward compatibility, the credentials are created by the credentials manager if the default credentials cannot be loaded.
+        return CredentialsManager(
+            cls.SCOPES,
+            is_inside_of_container=True,
+            path_to_credentials=path_to_credentials,
+            path_to_token=path_to_token,
+        ).create()
+
+
+class GoogleDrive:
+    """The Google Drive API."""
 
     def __init__(
         self,
@@ -34,12 +54,7 @@ class GoogleDrive:
         path_to_token: Path | None = None,
     ) -> None:
         self.logger = getLogger(__name__)
-        credentials = CredentialsManager(
-            self.SCOPES,
-            is_inside_of_container=True,
-            path_to_credentials=path_to_credentials,
-            path_to_token=path_to_token,
-        ).create()
+        credentials = CredentialsFactory.create(path_to_credentials, path_to_token)
         service: DriveResource = build("drive", "v3", credentials=credentials)
         # Reason: pylint: disable-next=no-member
         self.resource = service.files()
