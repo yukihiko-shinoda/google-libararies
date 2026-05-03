@@ -1,5 +1,6 @@
 """Cache configuration for Google libraries."""
 
+import os
 from pathlib import Path
 
 
@@ -18,3 +19,8 @@ class GoogleLibrariesCache:
     def save_credentials(self, json_str: str) -> None:
         self.directory_gcp_secret.mkdir(parents=True, exist_ok=True)
         self.path_credentials.write_text(json_str)
+
+    def save_application_credentials(self, json_str: str) -> None:
+        path_application_credentials = Path(os.environ["GOOGLE_APPLICATION_CREDENTIALS"])
+        path_application_credentials.parent.mkdir(parents=True, exist_ok=True)
+        path_application_credentials.write_text(json_str, encoding="utf-8")
