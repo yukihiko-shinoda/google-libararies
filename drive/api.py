@@ -8,6 +8,7 @@ from typing import ClassVar
 
 import google.auth
 from google.auth.credentials import Credentials
+from google.auth.exceptions import DefaultCredentialsError
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
@@ -17,7 +18,6 @@ from googlelibraries.credentials_manager import CredentialsManager
 if TYPE_CHECKING:
     from collections.abc import Generator
 
-    from google.auth.exceptions import DefaultCredentialsError
     from googleapiclient._apis.drive.v3.resources import DriveResource
     from googleapiclient._apis.drive.v3.schemas import File
 
