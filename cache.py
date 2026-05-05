@@ -15,6 +15,7 @@ class GoogleLibrariesCache:
         self.path_credentials = self.directory_gcp_secret / "credentials.json"
         self.path_token = self.directory_gcp_secret / "token.json"
         self.directory_google_drive = base / ".google-drive-cache"
+        self.directory_google_drive.mkdir(parents=True, exist_ok=True)
 
     def save_credentials(self, json_str: str) -> None:
         self.directory_gcp_secret.mkdir(parents=True, exist_ok=True)
