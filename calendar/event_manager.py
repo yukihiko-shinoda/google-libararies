@@ -1,16 +1,19 @@
 """Event manager."""
 
-from collections.abc import Generator
 import datetime
+from collections.abc import Generator
 from logging import getLogger
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
+from typing import Literal
 
 from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build, Resource
+from googleapiclient.discovery import Resource
+from googleapiclient.discovery import build
 from googleapiclient.http import HttpMock
 from httplib2 import Http
 
-from googlelibraries.calendar.event import Event, EventFactory
+from googlelibraries.calendar.event import Event
+from googlelibraries.calendar.event import EventFactory
 
 if TYPE_CHECKING:
     # Reason: google-api-python-client-stubs's issue?

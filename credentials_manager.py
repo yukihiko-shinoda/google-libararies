@@ -29,7 +29,7 @@ class CredentialsManager:
         self.scopes = scopes
         # Reason: This code is expected to run in Docker container.
         self.bind_addr = "0.0.0.0" if is_inside_of_container else None  # noqa: S104  # nosec: B104
-        self.path_to_credentials = path_to_credentials if path_to_credentials else self.PATH_TO_CREDENTIALS
+        self.path_to_credentials = path_to_credentials or self.PATH_TO_CREDENTIALS
 
     def create(self) -> Credentials:
         """Creates credentials.
@@ -38,7 +38,7 @@ class CredentialsManager:
         authorization flow completes for the first time.
         """
         credentials = self.token_manager.load_credentials()
-        return credentials if credentials else self.login()
+        return credentials or self.login()
 
     def login(self) -> Credentials:
         """If there are no (valid) credentials available, let the user log in."""

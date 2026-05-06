@@ -10,7 +10,6 @@ import google.auth
 from google.auth.credentials import Credentials
 from google.auth.exceptions import DefaultCredentialsError
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaIoBaseDownload
 
 from googlelibraries.credentials_manager import CredentialsManager
@@ -23,6 +22,8 @@ if TYPE_CHECKING:
 
 
 class CredentialsFactory:
+    """Creates Google API credentials, preferring application default credentials."""
+
     # If modifying these scopes, delete the file token.json.
     SCOPES: ClassVar = [
         "https://www.googleapis.com/auth/drive.metadata.readonly",
@@ -31,6 +32,7 @@ class CredentialsFactory:
 
     @classmethod
     def create(cls, path_to_credentials: Path | None = None, path_to_token: Path | None = None) -> Credentials:
+        """Create credentials, falling back to a file-based token if defaults are unavailable."""
         try:
             return google.auth.default()[0]
         except DefaultCredentialsError:
@@ -78,13 +80,7 @@ class GoogleDrive:
 
         Returns: The list of files.
         """
-        try:
-            # Call the Drive v3 API
-            response = self.resource.list(pageSize=10, fields="nextPageToken, files(id, name)").execute()
-        except HttpError:
-            # TODO(developer) - Handle errors from drive API.
-            self.logger.exception("An error occurred")
-            raise
+        response = self.resource.list(pageSize=10, fields="nextPageToken, files(id, name)").execute()
         return response.get("files", [])
 
     def get_files_in_folder(self, folder_name: str, file_name_contains: str) -> "Generator[File]":

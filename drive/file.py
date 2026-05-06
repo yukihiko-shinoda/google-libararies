@@ -55,6 +55,8 @@ class File:
 
 
 class FileFactory:
+    """Creates File objects pre-configured with a shared Google Drive connection."""
+
     def __init__(
         self,
         directory_cache: Path,

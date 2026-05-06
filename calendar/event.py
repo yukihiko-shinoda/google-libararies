@@ -7,10 +7,7 @@ from typing import TYPE_CHECKING
 from googlelibraries.calendar.datetime import GoogleCalendarDatetime
 
 if TYPE_CHECKING:
-    # Reason: google-api-python-client-stubs's issue?
-    from googleapiclient._apis.calendar.v3.schemas import (  # pyright: ignore[reportMissingModuleSource]  # isort:skip
-        Event as EventSchema,
-    )
+    from googleapiclient._apis.calendar.v3.schemas import Event as EventSchema
 
 
 @dataclass
@@ -37,6 +34,9 @@ class Event:
         if not isinstance(value, Event):
             raise NotImplementedError
         return self.summary == value.summary and self.start == value.start
+
+    def __hash__(self) -> int:
+        return hash(self.summary) + hash(self.start) + hash(self.end) + hash(self.description)
 
 
 class EventFactory:
