@@ -61,13 +61,26 @@ class GoogleDrive:
         # Reason: pylint: disable-next=no-member
         self.resource = service.files()
 
+    @staticmethod
+    def quote(value: str) -> str:
+        """Quote the value as a string literal in the Drive search query.
+
+        The backslash and the single quote must be escaped with a backslash:
+        - Search query terms and operators  |  Google Drive  |  Google for Developers
+          https://developers.google.com/workspace/drive/api/guides/ref-search-terms
+        """
+        escaped = value.replace("\\", "\\\\").replace("'", "\\'")
+        # Concatenation instead of f"'{escaped}'" since the `!r` conversion that B907 suggests
+        # quotes in Python's repr syntax, not in the Drive query syntax.
+        return "'" + escaped + "'"
+
     def get_folder(self, folder_name: str) -> str | None:
         """Gets the folder id by name.
 
         Args:
             folder_name (str): The name of the folder.
         """
-        query = f"mimeType = 'application/vnd.google-apps.folder' and name = '{folder_name}'"
+        query = f"mimeType = 'application/vnd.google-apps.folder' and name = {self.quote(folder_name)}"
         fields = "nextPageToken, files(id, name)"
         response = self.resource.list(q=query, pageSize=100, fields=fields).execute()
         # this gives us a list of all folders with that name
@@ -91,8 +104,10 @@ class GoogleDrive:
             file_name_contains: The name of the file.
         """
         folder_id = self.get_folder(folder_name)
+        if folder_id is None:
+            return
         page_token: str | None = ""
-        query = f"'{folder_id}' in parents and name contains '{file_name_contains}'"
+        query = f"{self.quote(folder_id)} in parents and name contains {self.quote(file_name_contains)}"
         fields = "nextPageToken, files(id, name)"
         while page_token is not None:
             response = self.resource.list(
