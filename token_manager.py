@@ -19,7 +19,7 @@ class TokenManager:
         self.path_to_token = self.PATH_TO_TOKEN if path_to_token is None else path_to_token
 
     def load_credentials(self) -> Credentials | None:
-        """Loads token."""
+        """Load token."""
         if not self.path_to_token.exists():
             return None
         # Reason: The google-auth-oauthlib's issue.
@@ -34,7 +34,7 @@ class TokenManager:
         return None
 
     def refresh(self, credentials: Credentials) -> Credentials | None:
-        """Refreshes the credentials."""
+        """Refresh the credentials."""
         try:
             # Reason: The google-auth-oauthlib's issue.
             credentials.refresh(Request())  # type: ignore[no-untyped-call]

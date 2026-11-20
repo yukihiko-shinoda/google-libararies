@@ -57,7 +57,7 @@ class EventManager:
         self.service.events().insert(calendarId=self.calendar_id, body=event.convert_to_body()).execute()
 
     def iterate_future_event(self, now: datetime.datetime) -> Generator[Event]:
-        """Iterates the events."""
+        """Iterate the events."""
         # Reason: Meta programming is used. pylint: disable-next=no-member
         events_resource = self.service.events()
         page_token = None

@@ -32,7 +32,7 @@ class CredentialsManager:
         self.path_to_credentials = path_to_credentials or self.PATH_TO_CREDENTIALS
 
     def create(self) -> Credentials:
-        """Creates credentials.
+        """Create credentials.
 
         The file token.json stores the user's access and refresh tokens, and is created automatically when the
         authorization flow completes for the first time.

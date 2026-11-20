@@ -76,7 +76,7 @@ class GoogleDrive:
         return "'" + escaped + "'"
 
     def get_folder(self, folder_name: str) -> str | None:
-        """Gets the folder id by name.
+        """Get the folder id by name.
 
         Args:
             folder_name (str): The name of the folder.
@@ -90,7 +90,7 @@ class GoogleDrive:
         return files[0].get("id")
 
     def get_files(self) -> list["File"]:
-        """Gets the files in the root folder.
+        """Get the files in the root folder.
 
         Returns: The list of files.
         """
@@ -98,7 +98,7 @@ class GoogleDrive:
         return response.get("files", [])
 
     def get_files_in_folder(self, folder_name: str, file_name_contains: str) -> "Generator[File]":
-        """Gets the files in the folder.
+        """Get the files in the folder.
 
         Args:
             folder_name: The name of the folder.
@@ -122,7 +122,7 @@ class GoogleDrive:
             page_token = response.get("nextPageToken")
 
     def download_file(self, file_id: str, path_export: Path) -> None:
-        """Downloads the file.
+        """Download the file.
 
         Args:
             file_id: The id of the file.
