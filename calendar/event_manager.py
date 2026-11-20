@@ -69,10 +69,7 @@ class EventManager:
                 timeMin=now.replace(microsecond=0).isoformat(),
                 singleEvents=True,
                 orderBy="startTime",
-                # Reason: Official documentation's instruction:
-                # - Events: list | Google Calendar | Google for Developers
-                #   https://developers.google.com/workspace/calendar/api/v3/reference/events/list?hl=ja
-                pageToken=page_token,  # type: ignore[arg-type]
+                pageToken=page_token,
             ).execute()
             yield from (EventFactory.create(event) for event in events_result["items"])
             page_token = events_result.get("nextPageToken")
