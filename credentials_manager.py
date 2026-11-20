@@ -1,3 +1,5 @@
+# SPDX-FileCopyrightText: Copyright (c) 2025 Yukihiko Shinoda
+# SPDX-License-Identifier: MIT
 """Credentials manager.
 
 see: https://developers.google.com/calendar/api/quickstart/python
