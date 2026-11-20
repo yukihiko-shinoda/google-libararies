@@ -1,6 +1,6 @@
 """Event manager."""
 
-import datetime
+import datetime as dt
 from collections.abc import Generator
 from logging import getLogger
 from typing import TYPE_CHECKING
@@ -56,7 +56,7 @@ class EventManager:
         # Reason: Meta programming is used. pylint: disable-next=no-member
         self.service.events().insert(calendarId=self.calendar_id, body=event.convert_to_body()).execute()
 
-    def iterate_future_event(self, now: datetime.datetime) -> Generator[Event]:
+    def iterate_future_event(self, now: dt.datetime) -> Generator[Event]:
         """Iterate the events."""
         # Reason: Meta programming is used. pylint: disable-next=no-member
         events_resource = self.service.events()
@@ -102,4 +102,4 @@ class EventManager:
 
     @staticmethod
     def create_now_string() -> str:
-        return datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0).isoformat()
+        return dt.datetime.now(tz=dt.UTC).replace(microsecond=0).isoformat()
