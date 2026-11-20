@@ -38,7 +38,8 @@ class CredentialsFactory:
         except DefaultCredentialsError:
             if not path_to_credentials or not path_to_token:
                 raise
-        # For backward compatibility, the credentials are created by the credentials manager if the default credentials cannot be loaded.
+        # For backward compatibility, the credentials are created by the credentials manager
+        # if the default credentials cannot be loaded.
         return CredentialsManager(
             cls.SCOPES,
             is_inside_of_container=True,
