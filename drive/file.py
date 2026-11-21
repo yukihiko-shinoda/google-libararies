@@ -11,6 +11,7 @@ from googlelibraries.drive.api import GoogleDrive
 if TYPE_CHECKING:
     from collections.abc import Generator
 
+    from google.auth.credentials import Credentials
     from googleapiclient._apis.drive.v3.schemas import File as FileSchema
 
 
@@ -64,11 +65,14 @@ class FileFactory:
         directory_cache: Path,
         path_to_credentials: Path | None = None,
         path_to_token: Path | None = None,
+        *,
+        credentials: "Credentials | None" = None,
     ) -> None:
         self.directory_cache = directory_cache
         self.drive = GoogleDrive(
             path_to_credentials=path_to_credentials,
             path_to_token=path_to_token,
+            credentials=credentials,
         )
 
     def create(self, folder_name: str, file_name_contains: str) -> File:

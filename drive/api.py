@@ -6,19 +6,24 @@ import io
 from logging import getLogger
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import Any
 from typing import ClassVar
 
 import google.auth
+from google.auth import aws
 from google.auth.credentials import Credentials
 from google.auth.exceptions import DefaultCredentialsError
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 
+from googlelibraries.aws_supplier import Boto3AwsSecurityCredentialsSupplier
 from googlelibraries.credentials_manager import CredentialsManager
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from collections.abc import Mapping
 
+    from google.auth.aws import AwsSecurityCredentialsSupplier
     from googleapiclient._apis.drive.v3.resources import DriveResource
     from googleapiclient._apis.drive.v3.schemas import File
 
@@ -49,6 +54,36 @@ class CredentialsFactory:
             path_to_token=path_to_token,
         ).create()
 
+    @classmethod
+    def create_from_aws_external_account(
+        cls,
+        info: "Mapping[str, Any]",
+        supplier: "AwsSecurityCredentialsSupplier | None" = None,
+    ) -> Credentials:
+        """Create workload identity federation credentials for AWS, supplying AWS credentials through boto3.
+
+        The credential source in the configuration is dropped since google-auth rejects it together with a supplier.
+        Supplying via boto3 makes the same configuration work both on AWS Lambda (environment variables)
+        and in the development container (credential_process).
+
+        Args:
+            info: The parsed credential configuration of workload identity federation for AWS.
+            supplier: The supplier of AWS security credentials. Defaults to the one backed by boto3.
+        """
+        info_without_source = {key: value for key, value in info.items() if key != "credential_source"}
+        # Reason: mypy strict mode rejects the call since google-auth leaves from_info() unannotated,
+        # while it is the documented way to build AWS external account credentials from a configuration:
+        # - google.auth.aws module — google-auth documentation
+        #   https://googleapis.dev/python/google-auth/latest/reference/google.auth.aws.html
+        # - Check that no untyped functions are called [no-untyped-call] — mypy documentation
+        #   https://mypy.readthedocs.io/en/stable/error_code_list2.html#check-that-no-untyped-functions-are-called-no-untyped-call
+        credentials: Credentials = aws.Credentials.from_info(  # type: ignore[no-untyped-call]
+            info_without_source,
+            aws_security_credentials_supplier=Boto3AwsSecurityCredentialsSupplier() if supplier is None else supplier,
+            scopes=cls.SCOPES,
+        )
+        return credentials
+
 
 class GoogleDrive:
     """The Google Drive API."""
@@ -57,9 +92,12 @@ class GoogleDrive:
         self,
         path_to_credentials: Path | None = None,
         path_to_token: Path | None = None,
+        *,
+        credentials: Credentials | None = None,
     ) -> None:
         self.logger = getLogger(__name__)
-        credentials = CredentialsFactory.create(path_to_credentials, path_to_token)
+        if credentials is None:
+            credentials = CredentialsFactory.create(path_to_credentials, path_to_token)
         service: DriveResource = build("drive", "v3", credentials=credentials)
         # Reason: pylint: disable-next=no-member
         self.resource = service.files()
